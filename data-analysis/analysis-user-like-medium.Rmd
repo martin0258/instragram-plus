@@ -1,0 +1,73 @@
+Data Analysis of `user-like-medium.csv`
+========================================================
+
+## Read Data
+```{r ReadData, cache=TRUE}
+# Read data of which users like what media.
+likes <- read.csv("../data/user-like-medium.csv")
+```
+
+## Check Duplication
+```{r CheckDuplication, eval=TRUE}
+# 0 means no duplication; otherwise duplication exists.
+anyDuplicated(likes)
+```
+
+## Preprocess Data
+```{r}
+# Remove "_" from medium ID (so we can use rle() later)
+likes$medium <- gsub("_", "", likes$medium)
+```
+
+## General Information
+```{r}
+# Number of likes
+num_likes <- nrow(likes)
+num_likes
+# Number of unique users
+num_users <- length(unique(likes$user))
+num_users
+# Number of unique media
+num_media <- length(unique(likes$medium))
+num_media
+```
+
+## Analyze Like Distribution
+### User-Based
+```{r UserLikeDistribution, tidy=FALSE, eval=TRUE}
+# Count number of likes for each user.
+user_like_count <- rle(sort(likes$user))$lengths
+# Display summary of number of likes for each user.
+summary(user_like_count)
+# Draw histogram:
+#   - x: number of likes
+#   - y: number of users
+user_like_count_lt20 <- user_like_count[user_like_count < 20]
+histogram <- hist(user_like_count_lt20,
+                  breaks=seq(0, 20),
+                  main="Histogram of user_like_count < 20",
+                  xlab="Number of likes",
+                  ylab="Number of users")
+histogram$breaks
+histogram$counts
+# Percentage
+100 * histogram$counts / num_users
+```
+
+### Medium-Based
+```{r MediumLikeDistribution, tidy=FALSE, eval=TRUE}
+# Count number of likes for each medium.
+medium_like_count <- rle(sort(likes$medium))$lengths
+# Display summary of number of likes for each medium.
+summary(medium_like_count)
+# Draw histogram:
+#   - x: number of likes
+#   - y: number of media
+histogram <- hist(medium_like_count,
+                  xlab="Number of likes",
+                  ylab="Number of media")
+histogram$breaks
+histogram$counts
+# Percentage
+100 * histogram$counts / num_media
+```
