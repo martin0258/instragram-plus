@@ -1,4 +1,4 @@
-Data Analysis of `user-like-medium.csv`
+Data Analysis of [user-like-medium.csv](../data/user-like-medium.csv)
 ========================================================
 
 ## Read Data
@@ -13,14 +13,8 @@ likes <- read.csv("../data/user-like-medium.csv")
 anyDuplicated(likes)
 ```
 
-## Preprocess Data
-```{r}
-# Remove "_" from medium ID (so we can use rle() later)
-likes$medium <- gsub("_", "", likes$medium)
-```
-
 ## General Information
-```{r}
+```{r GeneralInformation}
 # Number of likes
 num_likes <- nrow(likes)
 num_likes
@@ -34,40 +28,44 @@ num_media
 
 ## Analyze Like Distribution
 ### User-Based
-```{r UserLikeDistribution, tidy=FALSE, eval=TRUE}
+```{r UserLikeDistribution, tidy=FALSE, eval=TRUE, fig.width=15}
 # Count number of likes for each user.
-user_like_count <- rle(sort(likes$user))$lengths
+user_like_count <- data.frame(table(likes$user))$Freq
 # Display summary of number of likes for each user.
 summary(user_like_count)
-# Draw histogram:
-#   - x: number of likes
-#   - y: number of users
+# Only includes counts > 20 to make histogram concise.
 user_like_count_lt20 <- user_like_count[user_like_count < 20]
-histogram <- hist(user_like_count_lt20,
-                  breaks=seq(0, 20),
-                  main="Histogram of user_like_count < 20",
-                  xlab="Number of likes",
-                  ylab="Number of users")
-histogram$breaks
-histogram$counts
-# Percentage
-100 * histogram$counts / num_users
+# Get histogram object.
+h <- hist(user_like_count_lt20,
+          breaks=seq(0, 20),
+          plot=FALSE)
+
+# Change density to percentage.
+h$density <- (h$counts / num_users) * 100
+
+# Plot histogram (with counts on top of bars).
+plot(h, freq=FALSE, labels=paste(h$counts),
+     main="Histogram of user_like_count < 20",
+     xlab="Number of likes",
+     ylab="Percentage of users (%)")
 ```
 
 ### Medium-Based
 ```{r MediumLikeDistribution, tidy=FALSE, eval=TRUE}
 # Count number of likes for each medium.
-medium_like_count <- rle(sort(likes$medium))$lengths
+medium_like_count <- data.frame(table(likes$medium))$Freq
+
 # Display summary of number of likes for each medium.
 summary(medium_like_count)
-# Draw histogram:
-#   - x: number of likes
-#   - y: number of media
-histogram <- hist(medium_like_count,
-                  xlab="Number of likes",
-                  ylab="Number of media")
-histogram$breaks
-histogram$counts
-# Percentage
-100 * histogram$counts / num_media
+# Get histogram object.
+h <- hist(medium_like_count,
+          plot=FALSE)
+
+# Change density to percentage.
+h$density <- (h$counts / num_media) * 100
+
+# Plot histogram (with counts on top of bars).
+plot(h, freq=FALSE, labels=paste(h$counts),
+     xlab="Number of likes",
+     ylab="Percentage of media (%)")
 ```
