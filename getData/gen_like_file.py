@@ -24,12 +24,21 @@ def main():
     f = open('output_like_api.txt','w')
 
     target_user_id = 1281386577
-    steps = 2
+    steps = 1
     users_list = get_target_user_list(api,target_user_id, steps=steps)
     print str(steps)+" steps gets "+str(len(users_list))+" users"
     print "start crawling user media"
     #get_popular_media(api)
-
+    count = 0
+    '''
+    for user_id in users_list:
+        print "progress "+str(count)+"/"+str(len(users_list))+ "now:"+str(user_id)
+        media = get_user_all_media(api,user_id)
+        for medium in media:
+            medium_id = medium.id
+            likers = get_media_likes(api,medium_id)
+        count += 1
+    '''
     with open('output_like_api.txt','w') as f:
         count = 0
         
@@ -41,7 +50,6 @@ def main():
                 for liker in get_media_likes(api,medium_id):
                     f.write(str(liker.id)+","+medium_id+'\n')
             count += 1
-            
 
 def get_target_user_list(api,user_id,steps=2):
     fname = "tmp_data/get_target_user_list"+str(user_id)+"_"+str(steps)
@@ -106,7 +114,8 @@ def get_all_user_target_follows(api,target_id):
                 else:
                     print e
                     sleep(600)
-
+            except:
+                pass
         for user in users:
             result.add(user.id)
         if next == None:
@@ -114,7 +123,6 @@ def get_all_user_target_follows(api,target_id):
     with open(fname,'wb') as f:
         pickle.dump(result,f)
     return result
-#to-do try
 def get_all_user_followed_by(api,target_id):
     fname = "tmp_data/get_all_user_followed_by"+str(target_id)
     if os.path.isfile(fname):
@@ -137,6 +145,8 @@ def get_all_user_followed_by(api,target_id):
                 else:
                     print e
                     sleep(600)
+            except:
+                pass
         for user in users:
             result.add(user.id)
         if next == None:
@@ -168,6 +178,8 @@ def get_user_all_media(api,target_id):
                 else:
                     print e
                     sleep(600)
+            except:
+                pass
         result += recent_media
         if next == None:
             break
@@ -180,7 +192,6 @@ def get_media_likes(api,medium_id):
         with open(fname,'rb') as f:
             media = pickle.load(f)
             if media == None:
-                print "!!!!"+str(medium_id)
                 return []
         return media
     while True:
