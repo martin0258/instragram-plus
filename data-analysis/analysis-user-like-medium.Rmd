@@ -24,6 +24,8 @@ num_users
 # Number of unique media
 num_media <- length(unique(likes$medium))
 num_media
+# Sparsity of the utility matrix (% of known entries)
+(num_likes / num_users / num_media) * 100
 ```
 
 ## Analyze Like Distribution
@@ -48,6 +50,11 @@ plot(h, freq=FALSE, labels=paste(h$counts),
      main="Histogram of user_like_count < 20",
      xlab="Number of likes",
      ylab="Percentage of users (%)")
+# Plot number of user's likes.
+plot(sort(user_like_count, decreasing=TRUE),
+     main="Number of user's likes",
+     xlab="User index",
+     ylab="Number of likes")
 ```
 
 ### Medium-Based
@@ -68,4 +75,9 @@ h$density <- (h$counts / num_media) * 100
 plot(h, freq=FALSE, labels=paste(h$counts),
      xlab="Number of likes",
      ylab="Percentage of media (%)")
+# Plot number of medium's likes
+plot(sort(medium_like_count, decreasing=TRUE),
+     main="Number of medium's likes",
+     xlab="Medium index",
+     ylab="Number of likes")
 ```

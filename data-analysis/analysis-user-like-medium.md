@@ -53,6 +53,15 @@ num_media
 ## [1] 25105
 ```
 
+```r
+# Sparsity of the utility matrix (% of known entries)
+(num_likes/num_users/num_media) * 100
+```
+
+```
+## [1] 0.0247
+```
+
 
 ## Analyze Like Distribution
 ### User-Based
@@ -87,7 +96,17 @@ plot(h, freq=FALSE, labels=paste(h$counts),
      ylab="Percentage of users (%)")
 ```
 
-![plot of chunk UserLikeDistribution](figure/UserLikeDistribution.png) 
+![plot of chunk UserLikeDistribution](figure/UserLikeDistribution1.png) 
+
+```r
+# Plot number of user's likes.
+plot(sort(user_like_count, decreasing=TRUE),
+     main="Number of user's likes",
+     xlab="User index",
+     ylab="Number of likes")
+```
+
+![plot of chunk UserLikeDistribution](figure/UserLikeDistribution2.png) 
 
 
 ### Medium-Based
@@ -119,5 +138,15 @@ plot(h, freq=FALSE, labels=paste(h$counts),
      ylab="Percentage of media (%)")
 ```
 
-![plot of chunk MediumLikeDistribution](figure/MediumLikeDistribution.png) 
+![plot of chunk MediumLikeDistribution](figure/MediumLikeDistribution1.png) 
+
+```r
+# Plot number of medium's likes
+plot(sort(medium_like_count, decreasing=TRUE),
+     main="Number of medium's likes",
+     xlab="Medium index",
+     ylab="Number of likes")
+```
+
+![plot of chunk MediumLikeDistribution](figure/MediumLikeDistribution2.png) 
 
