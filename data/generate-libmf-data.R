@@ -28,6 +28,7 @@ val_range <- (num_subtrain + 1):(num_subtrain + num_val)
 test_range <- (num_subtrain + num_val + 1):num_likes
 
 # Write data.
+options(scipen=999) # Avoid scientic notation (libmf will crash).
 outputs <- list(
   list(data=likes[subtrain_range,], file="libmf/subtrain"),
   list(data=likes[val_range,], file="libmf/val"),
@@ -41,6 +42,7 @@ for (output in outputs)
               sep=" ",
               quote=FALSE)
 }
+options(scipen=0) # Revert to default value.
 
 # Record end execution time.
 end <- proc.time()
