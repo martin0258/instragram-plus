@@ -17,6 +17,16 @@ likes <- data.frame(user=users,
                     medium=media,
                     rating=ratings)
 
+# Ensure max user and item ID exist in train not val (for libmf).
+max_user_Id_idx <- which.max(likes$user)
+max_item_Id_idx <- which.max(likes$medium)
+# Store rows
+max_Id_rows <- likes[c(max_user_Id_idx, max_item_Id_idx),]
+# Delete rows
+likes <- likes[-c(max_user_Id_idx, max_item_Id_idx),]
+# Add rows at first.
+likes <- rbind(max_Id_rows, likes)
+
 # Calculate range of sub-train, validation, and test set.
 # Percentage: sub-train (60%); val (20%); test (20%).
 num_likes <- nrow(likes)
