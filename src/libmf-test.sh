@@ -7,6 +7,14 @@ subtrain=../data/libmf/subtrain
 val=../data/libmf/val
 test=../data/libmf/test
 
+if [ ! -f $libmf ];
+then
+  echo "File $libmf does not exist. Making it first..."
+  cd ../lib/libmf-1.1/
+  make
+  cd -
+fi
+
 ${libmf} convert ${subtrain} subtrain.bin
 ${libmf} convert ${val} val.bin
 ${libmf} convert ${test} test.bin
