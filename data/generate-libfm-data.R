@@ -1,8 +1,21 @@
+# Record start execution time.
+start <- proc.time()
+
 # Read data.
 likes <- read.csv("user-like-medium.csv")
 
-# Append rating column for libfm.
-likes[, "Rating"] <- 1
+# Map raw user and item ID to positive integers for libmf.
+## Convert factor to numeric.
+users <- as.numeric(factor(likes$user))
+media <- as.numeric(likes$medium)
+
+# Rating column.
+ratings <- rep(1, nrow(likes))
+
+# Replace raw data with transformed data.
+likes <- data.frame(user=users,
+                    medium=media,
+                    rating=ratings)
 
 # Calculate range of sub-train, validation, and test set.
 # Percentage: sub-train (60%); val (20%); test (20%).
@@ -15,21 +28,23 @@ val_range <- (num_subtrain + 1):(num_subtrain + num_val)
 test_range <- (num_subtrain + num_val + 1):num_likes
 
 # Write data.
-write.table(likes[subtrain_range,],
-            file="subtrain",
-            row.names=FALSE,
-            col.names=FALSE,
-            sep=" ",
-            quote=FALSE)
-write.table(likes[val_range,],
-            file="val",
-            row.names=FALSE,
-            col.names=FALSE,
-            sep=" ",
-            quote=FALSE)
-write.table(likes[test_range,],
-            file="test",
-            row.names=FALSE,
-            col.names=FALSE,
-            sep=" ",
-            quote=FALSE)
+outputs <- list(
+  list(data=likes[subtrain_range,], file="libmf/subtrain"),
+  list(data=likes[val_range,], file="libmf/val"),
+  list(data=likes[test_range,], file="libmf/test"))
+for (output in outputs)
+{
+  write.table(output$data,
+              file=output$file,
+              row.names=FALSE,
+              col.names=FALSE,
+              sep=" ",
+              quote=FALSE)
+}
+
+# Record end execution time.
+end <- proc.time()
+
+# Print execution time.
+cat("[Time Spent]\n")
+print(end - start)
