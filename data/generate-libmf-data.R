@@ -2,7 +2,7 @@
 start <- proc.time()
 
 # Read data.
-likes <- read.csv("user-like-medium.csv")
+likes <- read.csv("jimmy-2-steps-like-partial")
 
 # Map raw user and item ID to positive integers for libmf.
 ## Convert factor to numeric.
@@ -56,6 +56,34 @@ options(scipen=0) # Revert to default value.
 
 # Record end execution time.
 end <- proc.time()
+
+# Analysis
+subtrain_users <- unique(likes[subtrain_range, 1])
+subtrain_items <- unique(likes[subtrain_range, 2])
+val_users <- unique(likes[val_range, 1])
+val_items <- unique(likes[val_range, 2])
+test_users <- unique(likes[test_range, 1])
+test_items <- unique(likes[test_range, 2])
+
+val_subtrain_overlapping_user <- 
+  100 * length(intersect(subtrain_users,
+                         val_users)) /
+  length(val_users)
+
+val_subtrain_overlapping_item <- 
+  100 * length(intersect(subtrain_items,
+                         val_items)) /
+  length(val_items)
+
+test_subtrain_overlapping_user <- 
+  100 * length(intersect(subtrain_users,
+                         test_users)) /
+  length(test_users)
+
+test_subtrain_overlapping_item <- 
+  100 * length(intersect(subtrain_items,
+                         test_items)) /
+  length(test_items)
 
 # Print execution time.
 cat("[Time Spent]\n")
