@@ -1,11 +1,11 @@
-Data Analysis of [user-like-medium.csv](../data/user-like-medium.csv)
+Data Analysis of [jimmy-2-steps-like-partial](../../data/jimmy-2-steps-like-partial)
 ========================================================
 
 ## Read Data
 
 ```r
 # Read data of which users like what media.
-likes <- read.csv("../data/user-like-medium.csv")
+likes <- read.csv("../../data/jimmy-2-steps-like-partial")
 ```
 
 
