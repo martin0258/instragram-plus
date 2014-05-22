@@ -2,55 +2,47 @@ from instagram.client import InstagramAPI
 from instagram.bind import InstagramAPIError
 from pprint import pprint
 from time import sleep
+from operator import itemgetter
 import os.path
 import pickle
 def main():
     #get an access token
     #get the api list at https://github.com/Instagram/python-instagram
     #detail at http://instagram.com/developer/endpoints
+    
+    #jimmy
     access_token = "1281386577.1fb234f.7f92a2ee25e447c592e1f54a66e21faa"
-    api = InstagramAPI(access_token=access_token)
-    '''
-    while True:
-        try:
-            api.user_followed_by(1184036383)
-        except InstagramAPIError as e:
-            if e.status_code == 400
-                break
-            else
-                print e
-                sleep(600)
-    '''
-    f = open('output_like_api.txt','w')
-
     target_user_id = 1281386577
-    steps = 1
+
+    #louis
+    #access_token = "344818875.e56c4b8.8f6d96561a5d4e7a91d98018432f4542"
+    #target_user_id = 344818875
+
+    api = InstagramAPI(access_token=access_token)
+
+    
+    steps = 2
     users_list = get_target_user_list(api,target_user_id, steps=steps)
     print str(steps)+" steps gets "+str(len(users_list))+" users"
     print "start crawling user media"
     #get_popular_media(api)
     count = 0
-    '''
+
+    media_list = []
     for user_id in users_list:
         print "progress "+str(count)+"/"+str(len(users_list))+ "now:"+str(user_id)
         media = get_user_all_media(api,user_id)
         for medium in media:
-            medium_id = medium.id
-            likers = get_media_likes(api,medium_id)
+            medium_tmp = {'id':medium.id,'time':medium.created_time,'liker':[]}
+            for liker in get_media_likes(api,medium.id):
+                medium_tmp['liker'].append(liker.id)
+            media_list.append(medium_tmp)
         count += 1
-    '''
+    media_list  = sorted(media_list, key=itemgetter('time')) 
     with open('output_like_api.txt','w') as f:
-        count = 0
-        
-        for user_id in users_list:
-            print "progress "+str(count)+"/"+str(len(users_list))+ "now:"+str(user_id)
-            media = get_user_all_media(api,user_id)
-            for medium in media:
-                medium_id = medium.id
-                for liker in get_media_likes(api,medium_id):
-                    f.write(str(liker.id)+","+medium_id+'\n')
-            count += 1
-
+        for medium in media_list:
+            tmp_string = "%s:%s\n" % ( str(medium['id']), ','.join(medium['liker']) )
+            f.write(tmp_string)
 def get_target_user_list(api,user_id,steps=2):
     fname = "tmp_data/get_target_user_list"+str(user_id)+"_"+str(steps)
     if os.path.isfile(fname):
