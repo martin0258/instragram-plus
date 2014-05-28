@@ -1,5 +1,11 @@
 .Rproj.user
 .Rhistory
 .RData
+lib/libmf-1.1/*.o
+lib/libmf-1.1/libmf
+src/*.bin
+src/model
+src/output
 getData/*.txt
 getData/tmp_data/*
+getData/instagram/__pycache__
