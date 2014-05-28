@@ -9,3 +9,4 @@ src/output
 getData/*.txt
 getData/tmp_data/*
 getData/instagram/__pycache__
+getData/instagram/*.pyc

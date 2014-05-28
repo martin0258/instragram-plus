@@ -67,6 +67,7 @@ def main(args):
             result = get_location_all_media(api,location[0])
             tmp_str = location[0]+','+location[1][2]+','+str(len(result))+'\n'
             f.write(tmp_str)
+            count += 1
 
 if __name__ == "__main__":
     main(sys.argv[1:])
