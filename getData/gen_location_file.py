@@ -14,17 +14,18 @@ def read_data(filename):
 def get_location_all_media(api,target_id):
     fname = "tmp_data/get_location_all_media_"+str(target_id)
     if os.path.isfile(fname):
+        return []
         with open(fname,'rb') as f:
             result = pickle.load(f)
         return result
 
     result = []
     next = None
-
+    count = -1
     while True:
         while True:
             try:
-                recent_media, next = api.location_recent_media(count=-1,location_id=target_id, with_next_url=next)
+                recent_media, next = api.location_recent_media(count=count,location_id=target_id, with_next_url=next)
                 print 'get:'+str(len(recent_media))+' media'
                 break
             except InstagramAPIError as e:
@@ -35,6 +36,9 @@ def get_location_all_media(api,target_id):
                 else:
                     print e
                     sleep(600)
+            except:
+                count = 100000
+                pass
         result += recent_media
         if next == None:
             break
@@ -67,6 +71,7 @@ def main(args):
             result = get_location_all_media(api,location[0])
             tmp_str = location[0]+','+location[1][2]+','+str(len(result))+'\n'
             f.write(tmp_str)
+            count += 1
 
 if __name__ == "__main__":
     main(sys.argv[1:])
