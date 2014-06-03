@@ -12,19 +12,6 @@ def get_location_result(lat,lon):
         with open(fname,'rb') as f:
             results = pickle.load(f)
         return results
-<<<<<<< HEAD
-    url = "http://maihamakyo.org/etc/locastagram/index.php?mode=search&latlng="+str(lat)+","+str(lon)
-    response = urllib.request.urlopen(url)
-    results = response.read().decode('utf-8')
-    results = results[results.index('<table id="searchresult">'):]
-    results = results[:results.index('</tr>\n\t\t</table>')]
-    results = results.replace('\n','')
-    results = results.replace('\t','')
-    results = results.replace('</td>','')
-    results = results.replace('</th>','')
-    results = results.split('</tr><tr>')
-    results = [a.split('<td>')[1:] for a in results[1:]]
-=======
     while True:
         try:
             url = "http://maihamakyo.org/etc/locastagram/index.php?mode=search&latlng="+str(lat)+","+str(lon)
@@ -41,7 +28,6 @@ def get_location_result(lat,lon):
             break
         except:
             pass
->>>>>>> 44be3430a9b96d3f35345840ffe1f23a165c625f
     with open(fname,'wb') as f:
         pickle.dump(results,f)
     return results

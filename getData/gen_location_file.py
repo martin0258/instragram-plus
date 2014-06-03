@@ -37,10 +37,7 @@ def get_location_all_media(api,target_id):
                     print e
                     sleep(600)
             except:
-<<<<<<< HEAD
-=======
                 count = 100000
->>>>>>> 44be3430a9b96d3f35345840ffe1f23a165c625f
                 pass
         result += recent_media
         if next == None:
