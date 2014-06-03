@@ -35,6 +35,8 @@ def get_location_all_media(api,target_id):
                 else:
                     print e
                     sleep(600)
+            except:
+                pass
         result += recent_media
         if next == None:
             break
