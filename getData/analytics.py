@@ -5,10 +5,10 @@ def read_data(filename='output_location.txt'):
         return [line.strip().split(',') for line in f.readlines()]
 def sort_by_img_number(data_list):
     return sorted(data_list,key=lambda x:int(x[2]),reverse=True)
-def output_sort_result(f,sort_by_img_number_list,max_rank=10):
+def output_sort_result(f,sort_by_img_number_list,max_rank=50):
     f.write('rank : name,img_number\n')
     for i in range(max_rank+1):
-        tmp_str = str(i)+' : '+sort_by_img_number_list[i][1]+','+sort_by_img_number_list[i][2]+'\n'
+        tmp_str = str(i)+' : '+sort_by_img_number_list[i][1]+'('+sort_by_img_number_list[i][0]+')'+','+sort_by_img_number_list[i][2]+'\n'
         f.write(tmp_str)
     f.write('\n')
 def output_percent_img_number(filename='img_number',sort_by_img_number_list=None):
