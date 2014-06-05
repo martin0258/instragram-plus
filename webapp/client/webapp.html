@@ -4,30 +4,13 @@
   <meta charset="utf-8">
   <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
   <script>
-    var map;
-    var taiwan = new google.maps.LatLng(23.5989353, 121.0173534);
-    function initialize() {
-      var mapOptions = {
-        zoom: 8,
-        center: taiwan
-      };
-      map = new google.maps.Map(document.getElementById('map-canvas'),
-          mapOptions);
-      add_marker();
-    }
-
-    function add_marker() {
-      var marker = new google.maps.Marker({
-        position: taiwan,
-        map: map,
-      });
-    }
-
-    google.maps.event.addDomListener(window, 'load', initialize);
-
   </script>
 </head>
 <body>
   <h1>Instragram Plus</h1>
-  <div id="map-canvas"></div>
+  {{> map_canvas}}
 </body>
+
+<template name="map_canvas">
+  <div id="map-canvas"></div>
+</template>
