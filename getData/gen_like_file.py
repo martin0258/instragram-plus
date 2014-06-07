@@ -147,37 +147,7 @@ def get_all_user_followed_by(api,target_id):
         pickle.dump(result,f)
     return result
 
-def get_user_all_media(api,target_id):
-    fname = "tmp_data/get_user_all_media"+str(target_id)
-    if os.path.isfile(fname):
-        with open(fname,'rb') as f:
-            result = pickle.load(f)
-        return result
 
-    result = []
-    next = None
-
-    while True:
-        while True:
-            try:
-                recent_media, next = api.user_recent_media(user_id=target_id, with_next_url=next)
-                break
-            except InstagramAPIError as e:
-                if e.status_code == 400:
-                    recent_media = []
-                    next = None
-                    break
-                else:
-                    print e
-                    sleep(600)
-            except:
-                pass
-        result += recent_media
-        if next == None:
-            break
-    with open(fname,'wb') as f:
-        pickle.dump(result,f)
-    return result
 def get_media_likes(api,medium_id):
     fname = "tmp_data/get_media_likes"+str(medium_id)
     if os.path.isfile(fname):
