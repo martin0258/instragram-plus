@@ -1,4 +1,5 @@
 import instagramUtil
+import sys
 def read_location_data(fname):
     with open(fname,'r') as f:
         lines_token = [line[:-1].split(',') for line in f.readlines()]
@@ -13,7 +14,7 @@ def get_locations_media(location_list):
     for location in location_list:
         print str(count)+'/'+str(data_len)
         result = {}
-        medium = instagramUtil.get_location_all_media(api,location['id'])
+        medium = instagramUtil.get_location_all_media(location0['id'])
         result['medium'] = medium
         result['id'] = location['id']
         result['name'] = location['name']
@@ -28,11 +29,15 @@ def output_location_results(fname,location_results):
             f.write(tmp_str)
     return True
 def get_locations_media_user_info(location_results):
-    user_list = {}
+    results = {}
+    img_num_sum = sum([len(location) for location in location_results])
+    count = 1
     for location in location_results:
+        print str(count)+'/'+str(img_num_sum)
         for media in location['medium']:
-            user_list[media.user.id] = instagramUtil.get_user_all_media(media.user.id)
-    return user_list
+            results[media.user.id] = instagramUtil.get_user_all_media(media.user.id)
+        count += 1
+    return results
 def main(args):
     try:
         src_fname = args[0]
@@ -43,7 +48,7 @@ def main(args):
     location_list = read_location_data(src_fname)
     print 'read data done'
     location_results = get_locations_media(location_list)
-    
+    user_medium = get_locations_media_user_info(location_results)
     #output_location_results(des_fnamem,location_results)
 
 

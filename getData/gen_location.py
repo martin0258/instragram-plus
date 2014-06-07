@@ -48,6 +48,6 @@ for lat in numpy.linspace(lat-lat_range,lat+lat_range,(2*lat_range/0.001)+1):
             location_map[result[0]]=result[1:]
 with open('location.txt','rb') as f:
     for location in location_map:
-        tmp_str = location+','+','.join(location_map[location])+'\n'
+        tmp_str = location.strip()+','+','.join(location_map[location])+'\n'
         f.write(tmp_str)
 
