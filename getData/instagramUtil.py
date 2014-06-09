@@ -1,5 +1,6 @@
 from instagram.client import InstagramAPI
 from instagram.bind import InstagramAPIError
+from instagram.bind import InstagramClientError
 from time import sleep
 import os.path
 import pickle
@@ -14,18 +15,71 @@ __access_token_index = random.randrange(len(__access_token_list))
 __api = None
 
 def __initAPI():
+    global __api
+    global __access_token_list
+    global __access_token_index
     __api = InstagramAPI(access_token=__access_token_list[__access_token_index])
+
+
 def __switch_access_token():
+    global __api
+    global __access_token_list
+    global __access_token_index
     __access_token_index = random.randrange(len(__access_token_list))
     __api = InstagramAPI(access_token=__access_token_list[__access_token_index])
-def get_user_all_media(target_id,count=-1,max_time):
+
+
+def get_user_all_media(target_id,count=-1,time_period_in_sec=60*60*24*180,save_time=False):
+    global __api
     fname = "tmp_data/get_user_all_media"+str(target_id)
+    print "target:"+str(target_id)
     if os.path.isfile(fname):
+        if save_time == True:
+            return []
         with open(fname,'rb') as f:
             result = pickle.load(f)
         return result
+    start_time = int(datetime.datetime.now().strftime("%s"))
+    result = []
+    next = None
 
-def get_lat_lon_all_media(lat,lng,time_period_in_sec):
+    max_timestamp = start_time
+    api_count = 1500
+
+    while True:
+
+        while True:
+            try:
+                recent_media, next = __api.user_recent_media(count=api_count,user_id=target_id, with_next_url=next)
+                print "get:"+str(len(recent_media))
+                break
+            except InstagramAPIError as e:
+                if e.status_code == 400:
+                    recent_media = []
+                    next = None
+                    break
+                else:
+                    print "access_token_index "+str(__access_token_index)+"is out of limit request"
+                    __switch_access_token()
+            except InstagramClientError as e:
+                print e
+                api_count = 100
+                pass
+            except:
+                pass
+        result += recent_media
+        
+        if next == None:
+            break
+        max_timestamp = int(result[-1].created_time.strftime("%s"))+8*60*60
+        if (start_time - max_timestamp > time_period_in_sec) or len(recent_media)-count < 0:
+            break
+    with open(fname,'wb') as f:
+        pickle.dump(result,f)
+    return result
+
+def get_lat_lon_all_media(lat,lng,time_period_in_sec=60*60*24*180):
+    global __api
     start_time = int(datetime.datetime.now().strftime("%s"))
     fname = "tmp_data/get_lat_lon_all_media_"+str(lat)+','+str(lng)+'_'+str(start_time)
     result = []
@@ -36,7 +90,7 @@ def get_lat_lon_all_media(lat,lng,time_period_in_sec):
     while True:
         while True:
             try:
-                recent_media = api.media_search(count=count,lat=lat,lng=lng,max_timestamp=max_timestamp)
+                recent_media = __api.media_search(count=count,lat=lat,lng=lng,max_timestamp=max_timestamp)
                 cache_count += len(recent_media)
                 print 'get:'+str(len(recent_media))+' media max_timestamp:'+str(max_timestamp)
                 break
@@ -48,12 +102,14 @@ def get_lat_lon_all_media(lat,lng,time_period_in_sec):
                 else:
                     print "access_token_index "+str(__access_token_index)+"is out of limit request"
                     __switch_access_token()
+            except InstagramClientError:
+                pass
             except:
                 count = 100000
                 pass
         result += recent_media
 
-        if len(recent_media) == 0:
+        if next == None:
             break
         max_timestamp = int(result[-1].created_time.strftime("%s"))+8*60*60
         if start_time - max_timestamp > time_period_in_sec:
@@ -67,6 +123,7 @@ def get_lat_lon_all_media(lat,lng,time_period_in_sec):
     return result   
 
 def get_location_all_media(target_id):
+    global __api
     fname = "tmp_data/get_location_all_media_"+str(target_id)
     if os.path.isfile(fname):
         with open(fname,'rb') as f:
@@ -78,7 +135,7 @@ def get_location_all_media(target_id):
     while True:
         while True:
             try:
-                recent_media, next = api.location_recent_media(count=count,location_id=target_id, with_next_url=next)
+                recent_media, next = __api.location_recent_media(count=count,location_id=target_id, with_next_url=next)
                 print 'get:'+str(len(recent_media))+' media'
                 break
             except InstagramAPIError as e:
@@ -89,8 +146,12 @@ def get_location_all_media(target_id):
                 else:
                     print "access_token_index "+str(__access_token_index)+"is out of limit request"
                     __switch_access_token()
+            except InstagramClientError as e:
+                print e
+                pass
             except:
-                count = 100000
+                print "error occur"
+                count = 100
                 pass
         result += recent_media
         if next == None:
