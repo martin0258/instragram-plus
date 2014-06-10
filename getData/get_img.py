@@ -47,7 +47,7 @@ def get_location_img(location_id):
     with open(fname,'w') as f:
         for data in result:
             attribute = []
-            attribute.append(link.split('/')[-2])
+            attribute.append(data.link.split('/')[-2])
             attribute.append(str(data.like_count))
             if hasattr(data, 'tags'):
                 attribute.append(' '.join(tag.name for tag in data.tags))

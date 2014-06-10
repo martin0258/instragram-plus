@@ -44,8 +44,7 @@ def get_user_all_media(target_id,count=-1,time_period_in_sec=60*60*24*180,save_t
     next = None
 
     max_timestamp = start_time
-    api_count = 1500
-
+    api_count = -1
     while True:
 
         while True:
@@ -60,19 +59,20 @@ def get_user_all_media(target_id,count=-1,time_period_in_sec=60*60*24*180,save_t
                     break
                 else:
                     print "access_token_index "+str(__access_token_index)+"is out of limit request"
+                    print e
                     __switch_access_token()
             except InstagramClientError as e:
                 print e
-                api_count = 100
                 pass
             except:
+                api_count = 1000
                 pass
         result += recent_media
         
         if next == None:
             break
         max_timestamp = int(result[-1].created_time.strftime("%s"))+8*60*60
-        if (start_time - max_timestamp > time_period_in_sec) or len(recent_media)-count < 0:
+        if (start_time - max_timestamp > time_period_in_sec) or (len(recent_media)-count > 0 and count != -1):
             break
     with open(fname,'wb') as f:
         pickle.dump(result,f)
