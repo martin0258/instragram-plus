@@ -35,5 +35,30 @@ Meteor.methods({
       console.log(err_msg);
       throw new Meteor.Error(500, err_msg);
     }
+  },
+
+  get_icon_styles: function () {
+    var img_folder_path = '../client/app/img';
+    var exist = fs.existsSync(img_folder_path);
+    if (exist) {
+      // folder exists
+      var styles = [];
+      var files = fs.readdirSync(img_folder_path);
+      for (var i = 0; i < files.length; i++) {
+        var style = {
+          url: 'img/' + files[i],
+          height: 150,
+          width: 150
+        }
+        styles.push(style);
+      }
+      return styles;
+    }
+    else {
+      // file does not exist
+      var err_msg = filepath + " not found.";
+      console.log(err_msg);
+      throw new Meteor.Error(500, err_msg);
+    }
   }
 });
