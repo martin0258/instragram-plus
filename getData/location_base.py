@@ -1,4 +1,5 @@
 import instagramUtil
+import pickle
 import sys
 def read_location_data(fname):
     with open(fname,'r') as f:
@@ -6,6 +7,9 @@ def read_location_data(fname):
         #                  [location_id  [other value]]
         data_list = [ {'id':line[0],'lat':line[1],'lon':line[2],'name':line[3]} for line in lines_token]
     return data_list
+def read_location_results_from_pickle(fname):
+    with open(fname,'rb') as f:
+        return pickle.load(f)
 
 def get_locations_media(location_list):
     count = 1
@@ -17,6 +21,8 @@ def get_locations_media(location_list):
         medium = instagramUtil.get_location_all_media(location['id'])
         result['medium'] = medium
         result['id'] = location['id']
+        result['lat'] = location['lat']
+        result['lon'] = location['lon']
         result['name'] = location['name']
         results.append(result)
         count += 1
@@ -25,19 +31,19 @@ def get_locations_media(location_list):
 def output_location_results(fname,location_results):
     with open(fname,'w') as f :
         for location in location_results:
-            tmp_str = location['id']+','+location['name']+','+str(len(location['medium']))+'\n'
+            attribute =[]
+            attribute.append(location['id'])
+            attribute.append(location['lat'])
+            attribute.append(location['lon'])
+            attribute.append(location['name'])
+            attribute.append(str(len(location['medium'])))
+            tmp_str =','.join(attribute)+'\n'
             f.write(tmp_str)
     return True
-def get_locations_media_user_info(location_results):
-    results = {}
-    img_num_sum = sum([len(location['medium']) for location in location_results])
-    count = 1
-    for location in location_results:
-        for media in location['medium']:
-            print str(count)+'/'+str(img_num_sum)
-            results[media.user.id] = instagramUtil.get_user_all_media(target_id = media.user.id,count=1000)
-            count += 1
-    return results
+def output_location_results_to_pickle(fname,location_results):
+    with open(fname,'wb') as f :
+        pickle.dump(location_results,f)
+    return True
 def get_user_info(user_list):
     results = {}
     num_sum = len(user_list)
@@ -53,6 +59,17 @@ def read_user_list_data(fname="location_img_user_id.txt"):
         user_list = [line[:-1] for line in f.readlines()]
     return user_list
 
+def get_locations_media_user_info(location_results):
+    results = {}
+    img_num_sum = sum([len(location['medium']) for location in location_results])
+    count = 1
+    for location in location_results:
+        for media in location['medium']:
+            print str(count)+'/'+str(img_num_sum)
+            results[media.user.id] = instagramUtil.get_user_all_media(target_id = media.user.id,count=1000)
+            count += 1
+    return results
+
 def output_user_list_from_location(fname="location_img_user_id.txt",location_results=[]):
     results = {}
     count = 1
@@ -66,6 +83,21 @@ def output_user_list_from_location(fname="location_img_user_id.txt",location_res
             count += 1
             f.write(tmp_str)
     return True
+def get_user_info_job():
+    user_list = read_user_list_data()
+    get_user_info(user_list[::-1])
+    
+def output_location_image_created_time_info(location_results):
+
+    for location in location_results:
+        fname = 'img_time/'+location['id']+'.txt'
+        f = open(fname,'w')
+        for media in location['medium']:
+            attribute = [media.created_time.year,media.created_time.month,media.created_time.day,media.created_time.hour,media.created_time.minute,media.created_time.second]
+            attribute = [str(a) for a in attribute]
+            tmp_string = ','.join(attribute)+'\n'
+            f.write(tmp_string) 
+        f.close()
 
 def main(args):
     try:
@@ -75,15 +107,17 @@ def main(args):
         raise SystemExit('please input filename')
 
     
-    #location_list = read_location_data(src_fname)
-    #print 'read data done'
+    location_list = read_location_data(src_fname)
+    print 'read data done'
     #location_results = get_locations_media(location_list)
-
+    location_results = read_location_results_from_pickle('location_results.pickle')
+    output_location_results(des_fname,location_results)
     #output_user_list_from_location(location_results=location_results)
-    user_list = read_user_list_data()
-    get_user_info(user_list[::-1])
+
+    #-----get user_info----
+    #get_user_info_job()
     #user_medium = get_locations_media_user_info(location_results)
-    #output_location_results(des_fnamem,location_results)
+    #
 
 
 if __name__ == "__main__":

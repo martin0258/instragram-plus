@@ -1,12 +1,9 @@
 import urllib
 import instagramUtil
+import location_base
 import os.path
 import os
 import pickle
-def read_data(fname='temp_location.txt'):
-    with open(fname,'r') as f:
-        return [line.strip().split(',') for line in f.readlines()]
-
 def get_img(url,fname):
     if os.path.isfile(fname):
         return
@@ -58,17 +55,18 @@ def get_location_img(location_id):
             tmp_str = ','.join(attribute)+'\n'
             f.write(tmp_str.encode('utf-8'))
             count+=1
-    return 
-def main(): 
-
+    return
+def get_all_location_img_from_file(fname):
+    location_list = location_base.read_location_data(fname)
+    for location in location_list:
+        get_location_img(location['id'])
+def get_top_15_location_img():
     location_list = [32820,50594,9496078,687587,113224417,11132,39267,37593,28660,12144,16470,212795,2108091,12302,31362592,51726]
     for location in location_list:
-        get_location_img(location)
-    """
-    data_list = read_data()
-    print 'read done'
-    with open('img_list.txt','w') as f:
-        get_represent_img(f,data_list)
-    """
+        get_location_img(location['id'])
+def main(): 
+        #get_top_15_location_img
+        get_all_location_img_from_file("location.txt")
+
 if __name__ == '__main__':
     main()
