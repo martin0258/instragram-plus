@@ -4,26 +4,13 @@ var map;
 var map_options;
 
 var marker_cluster;
-var marker_cluster_options = { gridSize: 150, maxZoom: 15,
-  // set customize calculator
-  calculator: function (markers, numStyles) {
-    var count = markers.length.toString();
-    return {
-      text: count,
-      index: 1 + Math.floor(Math.random() * numStyles),
-      title: ""
-    };
-  }
-};
+var marker_cluster_options = { gridSize: 150, maxZoom: 15 };
 
 Template.map_canvas.rendered = function () {
   initialize_map();
 
-  Meteor.call('get_icon_styles', function (error, styles) {
-    marker_cluster_options["styles"] = styles;
-    Meteor.call('get_locations', function (error, locations) {
-      add_markers(locations);
-    });
+  Meteor.call('get_locations', function (error, locations) {
+    add_markers(locations);
   });
 };
 
@@ -37,9 +24,11 @@ function initialize_map() {
 function add_markers(locations) {
   var markers = [];
   for (var i = 0; i < locations.length; i++) {
-    var position = new google.maps.LatLng(locations[i].lat, locations[i].lng);
-    var marker = new google.maps.Marker({ position: position });
-    markers.push(marker);
+    for (var j = 0; j < locations[i].img_count; j++) {
+      var position = new google.maps.LatLng(locations[i].lat, locations[i].lng);
+      var marker = new google.maps.Marker({ position: position });
+      markers.push(marker);
+    }
   }
   marker_cluster = new MarkerClusterer(map, markers, marker_cluster_options);
   //marker_cluster = new MarkerClusterer(map, markers);
