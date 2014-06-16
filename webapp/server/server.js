@@ -49,5 +49,25 @@ Meteor.methods({
       console.log(err_msg);
       throw new Meteor.Error(500, err_msg);
     }
+  },
+
+  get_images: function (location_id, topN) {
+    var img_folder_path = 'imgs/finalresult/';
+    var images = [];
+    var location_filepath = img_folder_path + 'img_' + location_id + '.txt';
+    var lines = Assets.getText(location_filepath).toString().split("\n");
+
+    topN = (topN==null) ? lines.length : topN;
+
+    for (var i = 0; i < lines.length && i < topN; i++) {
+      var data = lines[i].split(',');
+      var image = {
+        rank: i + 1,
+        website_url: data[0],
+        img_url: data[1]
+      };
+      images.push(image);
+    }
+    return images;
   }
 });

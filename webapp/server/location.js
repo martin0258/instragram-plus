@@ -4,6 +4,7 @@
  *   (2) Filter out locations with no image at all (count = 0).
  */
 
+/*
 var fs = require('fs');
 var path = require('path');
 
@@ -28,3 +29,4 @@ for (row in lines) {
     fs.appendFileSync(outfile, data.join() + '\n');
   }
 }
+*/

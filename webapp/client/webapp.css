@@ -2,5 +2,20 @@
 html, body, #map-canvas {
   height: 100%;
   margin: 0px;
-  padding: 0px
+  padding: 0px;
+}
+
+#container {
+  margin-left:20px;
+  width:80%;
+}
+
+#range {
+  border:0;
+  color:#f6931f;
+  font-weight:bold;
+}
+
+.close-button {
+  float: right;
 }
