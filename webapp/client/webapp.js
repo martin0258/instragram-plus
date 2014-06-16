@@ -59,7 +59,7 @@ function initialize_filter() {
 function initialize_map() {
   taiwan = new google.maps.LatLng(23.5989353, 121.0173534);
   taipei = new google.maps.LatLng(25.0854062, 121.5615012);
-  map_options = { zoom: 7, center: taiwan };
+  map_options = { zoom: 8, center: taiwan };
   map = new google.maps.Map(document.getElementById('map-canvas'), map_options);
 
   // set layer
@@ -146,11 +146,14 @@ function display_images(images) {
 }
 
 function open_website(url) {
-  var iframe_html = '<iframe src="' + url + '/embed/' +
+  var website_link_html = '<div><a class="website-url" target="_blank" ' +
+                          'href="' + url + '">View on Instagram</a></div>';
+  var iframe_html = '<iframe id="frame" src="' + url + '/embed/' +
                     '" width="612" height="710" frameborder="0" ' +
-                    'allowtransparency="true"></iframe>';
+                    'allowtransparency="true" scrolling="no"></iframe>';
   var $dialog = $("<div></div>")
                 .append(iframe_html)
+                .append(website_link_html)
                 .dialog({
     autoOpen: false,
     modal: true,
@@ -159,5 +162,4 @@ function open_website(url) {
   });
 
   $dialog.dialog('open');
-  //window.open(url);
 }
