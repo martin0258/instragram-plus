@@ -4,6 +4,7 @@ import location_base
 import os.path
 import os
 import pickle
+
 def get_img(url,fname):
     if os.path.isfile(fname):
         return
@@ -27,19 +28,17 @@ def get_represent_img(f,data_list):
 def get_location_img(location_id):
 
     result = instagramUtil.get_location_all_media(location_id)
-    data_num = len(result)
+    directory_name = 'all_img/img_'+str(location_id)
     count = 1
-    directory_name = 'img_'+str(location_id)
     if not os.path.isdir(directory_name):
         os.mkdir(directory_name)
         for data in result:
-            print str(count)+'/'+str(data_num) 
             url = data.images['thumbnail'].url
             fname = directory_name+'/'+str(count)+'.jpg'
             get_img(url,fname)
             count +=1
 
-    count = 1
+    
     fname = directory_name+'/info.txt'
     with open(fname,'w') as f:
         for data in result:
@@ -54,16 +53,23 @@ def get_location_img(location_id):
             #photo id
             tmp_str = ','.join(attribute)+'\n'
             f.write(tmp_str.encode('utf-8'))
-            count+=1
     return
 def get_all_location_img_from_file(fname):
     location_list = location_base.read_location_data(fname)
+    count = 1
+    lenth = len(location_list)
     for location in location_list:
+        print "%d / %d" %(count,lenth)
         get_location_img(location['id'])
+        count += 1
 def get_top_15_location_img():
     location_list = [32820,50594,9496078,687587,113224417,11132,39267,37593,28660,12144,16470,212795,2108091,12302,31362592,51726]
+    count = 1
+    lenth = len(location_list)
     for location in location_list:
+        print "%d / %d" %(count,lenth)
         get_location_img(location['id'])
+        count += 1
 def main(): 
         #get_top_15_location_img
         get_all_location_img_from_file("location.txt")

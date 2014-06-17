@@ -5,7 +5,7 @@ def read_location_data(fname):
     with open(fname,'r') as f:
         lines_token = [line[:-1].split(',') for line in f.readlines()]
         #                  [location_id  [other value]]
-        data_list = [ {'id':line[0],'lat':line[1],'lon':line[2],'name':line[3]} for line in lines_token]
+        data_list = [ {'id':line[0],'lat':line[1],'lon':line[2],'name':line[3],'count':line[4]} for line in lines_token]
     return data_list
 def read_location_results_from_pickle(fname):
     with open(fname,'rb') as f:
@@ -29,14 +29,18 @@ def get_locations_media(location_list):
     return results
 #gen location file. format: id,name,media_count
 def output_location_results(fname,location_results):
+    locations = []
+    for location in location_results:
+        attribute =[]
+        attribute.append(location['id'])
+        attribute.append(location['lat'])
+        attribute.append(location['lon'])
+        attribute.append(location['name'])
+        attribute.append(str(len(location['medium'])))
+        locations.append(attribute)
+    locations = sorted(locations,key = lambda x:x[4], reverse =True)
     with open(fname,'w') as f :
-        for location in location_results:
-            attribute =[]
-            attribute.append(location['id'])
-            attribute.append(location['lat'])
-            attribute.append(location['lon'])
-            attribute.append(location['name'])
-            attribute.append(str(len(location['medium'])))
+        for attribute in locations:
             tmp_str =','.join(attribute)+'\n'
             f.write(tmp_str)
     return True
@@ -83,6 +87,35 @@ def output_user_list_from_location(fname="location_img_user_id.txt",location_res
             count += 1
             f.write(tmp_str)
     return True
+def is_in_taiwan(lon,lat):
+    return lon<122 and lon >119 and lat < 25.5 and lat >21.5
+def output_user_guess_list():
+    user_list = read_user_list_data()
+    num_sum = len(user_list)
+    count = 1    
+    with open('user_guess.txt','w') as f:
+        for u_id in user_list:
+            count_y = 0
+            count_n = 0
+            print str(count)+'/'+str(num_sum)
+            try:
+                for media in instagramUtil.get_user_all_media(target_id = u_id):
+                    if hasattr(media,'location') and media.location != None and media.location.point != None:
+                        if is_in_taiwan(lon= media.location.point.longitude,lat=media.location.point.latitude):
+                            count_y += 1
+                        else:
+                            count_n += 1
+                if count_y > count_n:
+                    tmp_str = "%s,%d,%d\n" % (u_id,1,count_y+count_n)
+                elif count_y == count_n:
+                    tmp_str = "%s,%d,%d\n" % (u_id,0,count_y+count_n)
+                else:
+                    tmp_str = "%s,%d,%d\n" % (u_id,-1,count_y+count_n)
+                f.write(tmp_str)
+            except:
+                pass
+            count += 1
+    return
 def get_user_info_job():
     user_list = read_user_list_data()
     get_user_info(user_list[::-1])
@@ -107,17 +140,17 @@ def main(args):
         raise SystemExit('please input filename')
 
     
-    location_list = read_location_data(src_fname)
+    #location_list = read_location_data(src_fname)
     print 'read data done'
     #location_results = get_locations_media(location_list)
-    location_results = read_location_results_from_pickle('location_results.pickle')
-    output_location_results(des_fname,location_results)
+    #location_results = read_location_results_from_pickle('location_results.pickle')
+    #output_location_results(des_fname,location_results)
     #output_user_list_from_location(location_results=location_results)
 
     #-----get user_info----
     #get_user_info_job()
     #user_medium = get_locations_media_user_info(location_results)
-    #
+    output_user_guess_list()
 
 
 if __name__ == "__main__":
