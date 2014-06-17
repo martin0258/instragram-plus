@@ -1,0 +1,34 @@
+<head>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+</head>
+<body>
+  <div id='container'>
+    <h3>Instagram Plus</h3>
+    {{> filter}}
+  </div>
+  {{> map_canvas}}
+  {{> images}}
+</body>
+
+<template name="filter">
+  <p>
+    <label for="range">Image count:</label>
+    <label id="range"></label>
+  </p>
+  <div id="slider-range"></div>
+
+  <div class="drop-down-container">
+    <select data-placeholder="Choose a location..."
+            id="location-list"></select>
+  </div>
+</template>
+
+<template name="map_canvas">
+  <div id="map-canvas"></div>
+</template>
+
+<template name="images">
+  <div class="bxslider"></div>
+</template>

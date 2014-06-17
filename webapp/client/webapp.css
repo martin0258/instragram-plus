@@ -1,0 +1,35 @@
+/* CSS declarations go here */
+html, body, #map-canvas {
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+#container {
+  margin-left:20px;
+  width:80%;
+}
+
+#range {
+  border:0;
+  color:#f6931f;
+  font-weight:bold;
+}
+
+.close-button {
+  float: right;
+}
+
+#frame {
+  /* Hide "View on Instagram" because it opens in current tab. */
+  margin-top: -60px;
+}
+
+.website-url {
+  float: right;
+}
+
+.drop-down-container {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
