@@ -28,3 +28,8 @@ html, body, #map-canvas {
 .website-url {
   float: right;
 }
+
+.drop-down-container {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}

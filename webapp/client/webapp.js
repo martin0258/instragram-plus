@@ -1,4 +1,5 @@
 var taiwan;
+var taipei;
 
 var map;
 var map_options;
@@ -24,8 +25,12 @@ var img_slider_options = {
   controls: true
 };
 
+// info window
+var info_window;
+
 Template.filter.rendered = function () {
   initialize_filter();
+  set_location_list();
 };
 
 Template.map_canvas.rendered = function () {
@@ -47,11 +52,14 @@ function initialize_filter() {
     max: 12500,
     values: [ 1000, 10000 ],
     slide: function( event, ui ) {
-      $( "#range" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+      $( "#range" ).text( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+    },
+    change: function (event, ui) {
+      set_location_list();
       set_layer();  // update fusion layer
     }
   });
-  $( "#range" ).val( $( "#slider-range" ).slider( "values", 0 ) +
+  $( "#range" ).text( $( "#slider-range" ).slider( "values", 0 ) +
                      " - " + $( "#slider-range" ).slider( "values", 1 ) );
 }
 
@@ -63,7 +71,7 @@ function initialize_map() {
   map = new google.maps.Map(document.getElementById('map-canvas'), map_options);
 
   // set layer
-  layer = new google.maps.FusionTablesLayer();
+  layer = new google.maps.FusionTablesLayer({suppressInfoWindows: true});
   set_layer();
   layer.setMap(map);
 }
@@ -88,61 +96,114 @@ function set_layer() {
   });
 }
 
+function set_location_list() {
+  var min = $( "#slider-range" ).slider( "values", 0 );
+  var max = $( "#slider-range" ).slider( "values", 1 );
+  $('#location-list').find('option').remove();
+  Meteor.call('get_locations', min, max, function (err, locations) {
+    $('#location-list').append('<option value></option>');
+
+    for (var i = 0; i < locations.length; i++) {
+      var location = locations[i];
+      var html = '<option value="' + location.id + '">' +
+                 '(' + location.img_count + ') ' +
+                 location.name +
+                 '</option>';
+      $('#location-list').append(html);
+    }
+    
+    // update drop-down list
+    $('#location-list').chosen()
+                       .trigger("chosen:updated")
+                       // unbind is necessary or we'll hook multiple handlers
+                       .unbind('change')
+                       .change(function() {
+                         var location_id = $(this).val();
+                         // show location info window
+                         display_info_window(location_id);
+                         // show images
+                         display_images(location_id);
+                       });
+  });
+}
+
 // handle google map event click
 function set_click_listener() {
-  var topN = 20;
   google.maps.event.addListener(layer, 'click', function(e) {
     var location_id = e.row["Id"].value;
-    Meteor.call('get_images', location_id, topN, function (err, images) {
-      display_images(images);
+    display_info_window(location_id);
+    display_images(location_id);
+  });
+}
+
+function display_info_window(location_id) {
+  Meteor.call('get_location', location_id, function(err, location) {
+    var html = [];
+    html.push('<strong>Lat:</strong> ' + location.lat);
+    html.push('<br><strong>Lng:</strong> ' + location.lng);
+    html.push('<br><strong>Name:</strong> ' + location.name);
+    html.push('<br><strong>Image Count:</strong> ' + location.img_count);
+
+    info_window = new google.maps.InfoWindow();
+    var position = new google.maps.LatLng(location.lat, location.lng);
+    var pixel_offset = new google.maps.Size(0, 0, "px", "px");
+    info_window.setOptions({
+      content : html.join(''),
+      position : position,
+      pixelOffset : pixel_offset
     });
-  });  
+    info_window.open(map);
+  });
 }
 
 // display images at bottom
-function display_images(images) {
-  // We hope not to let users see updating flash.
-  $('.bx-wrapper').hide();
+function display_images(location_id) {
+  var topN = 20;
 
-  // remove all previous slides
-  $('.bxslider').find('.slide').remove();
-
-  // add slides
-  for (var i = 0; i < images.length; i++) {
-    var image = images[i];
-    var src = '<div class="slide">' +
-              '<img src="' + image.img_url + 
-              '" data-website="' + image.website_url +
-              '" title="' + image.rank + '" />' +
-              '</div>';
-    $('.bxslider').append(src);
-  }
-
-  $('.bxslider').find('.slide').find('img').click(function(){
-    var url = $(this).attr('data-website');
-    open_website(url);
-  });
- 
-  // reload image slider
-  img_slider.reloadSlider(img_slider_options);
-
-  // add close button
-  var close_btn_html = '<button class="close-button">' +
-                       '<span class="ui-icon ui-icon-close"></span>' +
-                       '</button>';
-  // FIXME: duplicate code
-  $('.bx-wrapper').css({position: 'absolute',
-                        bottom: '0px',
-                        left: '20px'})
-                  .prepend(close_btn_html);
-  // add close button handler
-  $('.close-button').click(function(){
+  Meteor.call('get_images', location_id, topN, function (err, images) {
+    // We hope not to let users see updating flash.
     $('.bx-wrapper').hide();
-  });
 
-  // hotfix of overlapping issue
-  $('.bx-next').css({'z-index':99});
-  $('.bx-wrapper').show();
+    // remove all previous slides
+    $('.bxslider').find('.slide').remove();
+
+    // add slides
+    for (var i = 0; i < images.length; i++) {
+      var image = images[i];
+      var src = '<div class="slide">' +
+                '<img src="' + image.img_url + 
+                '" data-website="' + image.website_url +
+                '" title="' + image.rank + '" />' +
+                '</div>';
+      $('.bxslider').append(src);
+    }
+
+    $('.bxslider').find('.slide').find('img').click(function(){
+      var url = $(this).attr('data-website');
+      open_website(url);
+    });
+   
+    // reload image slider
+    img_slider.reloadSlider(img_slider_options);
+
+    // add close button
+    var close_btn_html = '<button class="close-button">' +
+                         '<span class="ui-icon ui-icon-close"></span>' +
+                         '</button>';
+    // FIXME: duplicate code
+    $('.bx-wrapper').css({position: 'absolute',
+                          bottom: '0px',
+                          left: '20px'})
+                    .prepend(close_btn_html);
+    // add close button handler
+    $('.close-button').click(function(){
+      $('.bx-wrapper').hide();
+    });
+
+    // hotfix of overlapping issue
+    $('.bx-next').css({'z-index':99});
+    $('.bx-wrapper').show();
+  });
 }
 
 function open_website(url) {

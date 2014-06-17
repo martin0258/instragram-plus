@@ -15,9 +15,14 @@
 <template name="filter">
   <p>
     <label for="range">Image count:</label>
-    <input type="text" id="range">
+    <label id="range"></label>
   </p>
   <div id="slider-range"></div>
+
+  <div class="drop-down-container">
+    <select data-placeholder="Choose a location..."
+            id="location-list"></select>
+  </div>
 </template>
 
 <template name="map_canvas">
