@@ -22,7 +22,7 @@ html, body, #map-canvas {
 
 #frame {
   /* Hide "View on Instagram" because it opens in current tab. */
-  margin-top: -50px;
+  margin-top: -60px;
 }
 
 .website-url {
